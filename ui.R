@@ -10,21 +10,25 @@ library(shiny)
 shinyUI(fluidPage(
 
   # Application title
-  titlePanel("Old Faithful Geyser Data"),
+  titlePanel("Hospital Compare: HCAHPS for Hospitals in RI"),
 
   # Sidebar with a slider input for number of bins
   sidebarLayout(
     sidebarPanel(
-      sliderInput("bins",
-                  "Number of bins:",
-                  min = 1,
-                  max = 50,
-                  value = 30)
+      selectInput("mgroup",
+                  label = "Select Measure Group:",
+                  choices = mchoices,
+                  selected = mchoices[1])
     ),
 
     # Show a plot of the generated distribution
     mainPanel(
-      plotOutput("distPlot")
+      tabsetPanel(
+        tabPanel("Plots",
+                 plotOutput("p"),
+                 plotOutput("p1")),
+        tabPanel("Tables"),
+        tabPanel("Measure Info"))
     )
   )
 ))

@@ -1,12 +1,12 @@
 {
-    "contents" : "\n# This is the server logic for a Shiny web application.\n# You can find out more about building applications with Shiny here:\n#\n# http://shiny.rstudio.com\n#\n\nlibrary(shiny)\n\nshinyServer(function(input, output) {\n\n  output$distPlot <- renderPlot({\n\n    # generate bins based on input$bins from ui.R\n    x    <- faithful[, 2]\n    bins <- seq(min(x), max(x), length.out = input$bins + 1)\n\n    # draw the histogram with the specified number of bins\n    hist(x, breaks = bins, col = 'darkgray', border = 'white')\n\n  })\n\n})\n",
+    "contents" : "\n# This is the server logic for a Shiny web application.\n# You can find out more about building applications with Shiny here:\n#\n# http://shiny.rstudio.com\n#\n\nlibrary(shiny)\nlibrary(ggplot2)\nlibrary(dplyr)\n\nshinyServer(function(input, output) {\n\n  output$p <- renderPlot({\n    \n    if(input$mgroup == \"Received Help\"){\n      d <- filter(hcahps.hosp, hcahps_measure_id %in% received.help[1])\n    }\n    else{\n      d <- filter(hcahps.hosp, hcahps_measure_id %in% clean.bath[1])\n    }\n    \n    ggplot(d, aes(provider_id, as.numeric(hcahps_answer_percent))) +\n      geom_point(size = 4)\n\n  })\n output$p1 <- renderPlot({\n   if(input$mgroup == \"Received Help\"){\n     d <- filter(hcahps.hosp, hcahps_measure_id %in% received.help[2])\n   }\n   else{\n     d <- filter(hcahps.hosp, hcahps_measure_id %in% clean.bath[2])\n   }\n   \n   ggplot(d, aes(provider_id, as.numeric(hcahps_answer_percent))) +\n     geom_point(size = 4) +\n     coord_flip()\n   \n })\n\n})\n",
     "created" : 1421674011541.000,
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "3547284186",
+    "hash" : "1334998556",
     "id" : "6F8A7F53",
-    "lastKnownWriteTime" : 1421674008,
+    "lastKnownWriteTime" : 1421699645,
     "path" : "~/Dropbox/R/shiny/hospital_compare/server.R",
     "project_path" : "server.R",
     "properties" : {
