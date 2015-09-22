@@ -1,51 +1,83 @@
+# global.R, runs at outset of application launch
+
 # load packages
-library("shiny")
 library("RSocrata")
+library("shiny")
 library("dplyr")
 
 # create data frames
-hcahps.nat.bench <- read.socrata("https://data.medicare.gov/resource/99ue-w85f.json")
+# hcahps.nat.bench <- read.socrata("https://data.medicare.gov/resource/99ue-w85f.json")
 hcahps.st.bench <- read.socrata("https://data.medicare.gov/resource/84jm-wiui.json?state=RI")
 hcahps.hosp <- read.socrata("https://data.medicare.gov/resource/dgck-syfz.json?state=RI")
+ht1 <- 600 # summary plot height
+wd1 <- 507 # summary plot width
 
-hcahps.nat.bench$mgroup <- NA
-hcahps.nat.bench[grep("received help", tolower(hcahps.nat.bench$hcahps_question)), "mgroup"] <- "Received Help"
-hcahps.nat.bench[grep("bathroom", tolower(hcahps.nat.bench$hcahps_question)), "mgroup"] <- "Clean Bathroom"
-hcahps.nat.bench[grep("communicated well", tolower(hcahps.nat.bench$hcahps_question)), "mgroup"] <- "Staff Communication"
-hcahps.nat.bench[grep("pain", tolower(hcahps.nat.bench$hcahps_question)), "mgroup"] <- "Pain Control"
-hcahps.nat.bench[grep("explained about medicines", tolower(hcahps.nat.bench$hcahps_question)), "mgroup"] <- "Meds Explained"
-hcahps.nat.bench[grep("quiet at night", tolower(hcahps.nat.bench$hcahps_question)), "mgroup"] <- "Quiet Room"
-hcahps.nat.bench[grep("given information", tolower(hcahps.nat.bench$hcahps_question)), "mgroup"] <- "Given Information"
-hcahps.nat.bench[grep("understood their care", tolower(hcahps.nat.bench$hcahps_question)), "mgroup"] <- "Understood Care"
-hcahps.nat.bench[grep("rating", tolower(hcahps.nat.bench$hcahps_question)), "mgroup"] <- "Hospital Rating"
-hcahps.nat.bench[grep("recommend the hospital", tolower(hcahps.nat.bench$hcahps_question)), "mgroup"] <- "Recommend Hospital"
-
+# initialize measure group variable
 hcahps.hosp$mgroup <- NA
-hcahps.hosp[grep("received help", tolower(hcahps.hosp$hcahps_question)), "mgroup"] <- "Received Help"
-hcahps.hosp[grep("bathroom", tolower(hcahps.hosp$hcahps_question)), "mgroup"] <- "Clean Bathroom"
-hcahps.hosp[grep("communicated well", tolower(hcahps.hosp$hcahps_question)), "mgroup"] <- "Staff Communication"
-hcahps.hosp[grep("pain", tolower(hcahps.hosp$hcahps_question)), "mgroup"] <- "Pain Control"
-hcahps.hosp[grep("explained about medicines", tolower(hcahps.hosp$hcahps_question)), "mgroup"] <- "Meds Explained"
-hcahps.hosp[grep("quiet at night", tolower(hcahps.hosp$hcahps_question)), "mgroup"] <- "Quiet Room"
-hcahps.hosp[grep("given information", tolower(hcahps.hosp$hcahps_question)), "mgroup"] <- "Given Information"
-hcahps.hosp[grep("understood their care", tolower(hcahps.hosp$hcahps_question)), "mgroup"] <- "Understood Care"
-hcahps.hosp[grep("rating", tolower(hcahps.hosp$hcahps_question)), "mgroup"] <- "Hospital Rating"
-hcahps.hosp[grep("recommend the hospital", tolower(hcahps.hosp$hcahps_question)), "mgroup"] <- "Recommend Hospital"
+
+# set each measure group based on measure_id
+hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_STAR_RATING"), "mgroup"] <- "Summary"
+hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_CLEAN_HSP_A_P", "H_CLEAN_STAR_RATING"), "mgroup"] <- "Cleanliness"
+hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_1_A_P", "H_COMP_1_STAR_RATING"), "mgroup"] <- "Nurse Communication"
+hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_2_A_P", "H_COMP_2_STAR_RATING"), "mgroup"] <- "Doctor Communication"
+hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_3_A_P", "H_COMP_3_STAR_RATING"), "mgroup"] <- "Staff Responsiveness"
+hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_4_A_P", "H_COMP_4_STAR_RATING"), "mgroup"] <- "Pain Management"
+hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_5_A_P", "H_COMP_5_STAR_RATING"), "mgroup"] <- "Communication about Meds"
+hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_6_Y_P", "H_COMP_6_STAR_RATING"), "mgroup"] <- "Discharge Information"
+hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_7_SA", "H_COMP_7_STAR_RATING"), "mgroup"] <- "Care Transition"
+hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_HSP_RATING_9_10", "H_HSP_RATING_STAR_RATING"), "mgroup"] <- "Overall Rating"
+hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_QUIET_HSP_A_P", "H_QUIET_STAR_RATING"), "mgroup"] <- "Quietness"
+hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_RECMND_DY", "H_RECMND_STAR_RATING"), "mgroup"] <- "Recommend Hospital"
 
 hcahps.st.bench$mgroup <- NA
-hcahps.st.bench[grep("received help", tolower(hcahps.st.bench$hcahps_question)), "mgroup"] <- "Received Help"
-hcahps.st.bench[grep("bathroom", tolower(hcahps.st.bench$hcahps_question)), "mgroup"] <- "Clean Bathroom"
-hcahps.st.bench[grep("communicated well", tolower(hcahps.st.bench$hcahps_question)), "mgroup"] <- "Staff Communication"
-hcahps.st.bench[grep("pain", tolower(hcahps.st.bench$hcahps_question)), "mgroup"] <- "Pain Control"
-hcahps.st.bench[grep("explained about medicines", tolower(hcahps.st.bench$hcahps_question)), "mgroup"] <- "Meds Explained"
-hcahps.st.bench[grep("quiet at night", tolower(hcahps.st.bench$hcahps_question)), "mgroup"] <- "Quiet Room"
-hcahps.st.bench[grep("given information", tolower(hcahps.st.bench$hcahps_question)), "mgroup"] <- "Given Information"
-hcahps.st.bench[grep("understood their care", tolower(hcahps.st.bench$hcahps_question)), "mgroup"] <- "Understood Care"
-hcahps.st.bench[grep("rating", tolower(hcahps.st.bench$hcahps_question)), "mgroup"] <- "Hospital Rating"
-hcahps.st.bench[grep("recommend the hospital", tolower(hcahps.st.bench$hcahps_question)), "mgroup"] <- "Recommend Hospital"
+hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_STAR_RATING"), "mgroup"] <- "Summary"
+hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_CLEAN_HSP_A_P", "H_CLEAN_STAR_RATING"), "mgroup"] <- "Cleanliness"
+hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_1_A_P", "H_COMP_1_STAR_RATING"), "mgroup"] <- "Nurse Communication"
+hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_2_A_P", "H_COMP_2_STAR_RATING"), "mgroup"] <- "Doctor Communication"
+hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_3_A_P", "H_COMP_3_STAR_RATING"), "mgroup"] <- "Staff Responsiveness"
+hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_4_A_P", "H_COMP_4_STAR_RATING"), "mgroup"] <- "Pain Management"
+hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_5_A_P", "H_COMP_5_STAR_RATING"), "mgroup"] <- "Communication about Meds"
+hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_6_Y_P", "H_COMP_6_STAR_RATING"), "mgroup"] <- "Discharge Information"
+hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_7_SA", "H_COMP_7_STAR_RATING"), "mgroup"] <- "Care Transition"
+hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_HSP_RATING_9_10", "H_HSP_RATING_STAR_RATING"), "mgroup"] <- "Overall Rating"
+hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_QUIET_HSP_A_P", "H_QUIET_STAR_RATING"), "mgroup"] <- "Quietness"
+hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_RECMND_DY", "H_RECMND_STAR_RATING"), "mgroup"] <- "Recommend Hospital"
 
 
-mchoices <- unique(hcahps.nat.bench$mgroup)
+
+# remove rows without mgroup
+hcahps.hosp <- filter(hcahps.hosp, !is.na(mgroup)) %>% 
+  select(provider_id, hospital_name, hcahps_measure_id, hcahps_question,
+         measure_start_date, measure_end_date, hcahps_answer_percent,
+         patient_survey_star_rating, mgroup)
+
+hcahps.st.bench <- filter(hcahps.st.bench, !is.na(mgroup))
+
+# create short names data frame
+hospID <- as.character(c(410001, 410004:410013))
+hosp.short.names <- c("MHRI", "RWMC", "FATIMA", "NWPRT", "RIH", "SCH", "KENT", "WIH", "LNDMRK", "MIRIAM", "WSTRLY")
+hosp.short <- data_frame(provider_id = hospID, short_name = hosp.short.names)
+rm(hospID, hosp.short.names)
+
+# join to main data frame
+hcahps.hosp <- left_join(hcahps.hosp, hosp.short, by = "provider_id")
+
+measure.start.date <- substr(unique(hcahps.hosp$measure_start_date), 1, 10)
+measure.end.date <- substr(unique(hcahps.hosp$measure_end_date), 1, 10)
+
+# separate star and percent and append back together to merge value
+star <- filter(hcahps.hosp, patient_survey_star_rating != "Not Applicable") %>% 
+  select(-hcahps_answer_percent)
+nonstar <- filter(hcahps.hosp, hcahps_answer_percent != "Not Applicable") %>% 
+  select(-patient_survey_star_rating)
+
+stard <- filter(hcahps.hosp, patient_survey_star_rating != "Not Applicable") %>% 
+  select(short_name, patient_survey_star_rating, mgroup)
+
+# set choices variable
+mchoices <- unique(hcahps.hosp$mgroup)
+
+tabtext <- mchoices[1]
 
 # function for multiple ggplots
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
