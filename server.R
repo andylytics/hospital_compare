@@ -89,7 +89,7 @@ shinyServer(function(input, output) {
         scale_y_continuous(labels = percent) +
         geom_hline(yintercept = as.numeric(bench$hcahps_answer_percent)/100, linetype = "dashed") +
         geom_text(data = NULL, x = 1.5, y = as.numeric(bench$hcahps_answer_percent)/100, label = "state\nbenchmark", size = 4.5) +
-        ggtitle(gsub(strsplit(nonstar$hcahps_question, " ")[[1]][7], paste0(strsplit(nonstar$hcahps_question, " ")[[1]][7], "\n"), nonstar$hcahps_question))
+        ggtitle(gsub(strsplit(as.character(nonstar$hcahps_question), " ")[[1]][7], paste0(strsplit(as.character(nonstar$hcahps_question), " ")[[1]][7], "\n"), as.character(nonstar$hcahps_question)))
         
       #coord_flip()
       multiplot(starplot, nonstarplot, cols = 1)

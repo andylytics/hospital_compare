@@ -4,11 +4,20 @@
 library("RSocrata")
 library("shiny")
 library("dplyr")
+library("lubridate")
 
 # create data frames
 # hcahps.nat.bench <- read.socrata("https://data.medicare.gov/resource/99ue-w85f.json")
 hcahps.st.bench <- read.socrata("https://data.medicare.gov/resource/84jm-wiui.json?state=RI")
-hcahps.hosp <- read.socrata("https://data.medicare.gov/resource/dgck-syfz.json?state=RI")
+
+# 2015-10-14 update, json not working, switch to csv, but now field names are different
+#hcahps.hosp <- read.socrata("https://data.medicare.gov/resource/dgck-syfz.json?state=RI")
+# hcahps.hosp <- read.socrata("https://data.medicare.gov/resource/dgck-syfz.csv?state=RI")
+hcahps.hosp <- read.csv("https://data.medicare.gov/resource/dgck-syfz.csv?state=RI",
+                        colClasses = "character")
+colnames(hcahps.hosp) <- tolower(colnames(hcahps.hosp))
+colnames(hcahps.hosp) <- gsub("\\.", "_", colnames(hcahps.hosp))
+
 ht1 <- 600 # summary plot height
 wd1 <- 507 # summary plot width
 
@@ -44,6 +53,12 @@ hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_QUIET_HSP_A_P", "H_Q
 hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_RECMND_DY", "H_RECMND_STAR_RATING"), "mgroup"] <- "Recommend Hospital"
 
 
+# 2015-10-14 convert date fields
+# hcahps.hosp$measure_start_date <- as.Date(hcahps.hosp$measure_start_date)
+# hcahps.hosp$measure_end_date <- as.Date(hcahps.hosp$measure_end_date)
+
+hcahps.hosp$measure_start_date <- mdy(hcahps.hosp$measure_start_date)
+hcahps.hosp$measure_end_date <- mdy(hcahps.hosp$measure_end_date)
 
 # remove rows without mgroup
 hcahps.hosp <- filter(hcahps.hosp, !is.na(mgroup)) %>% 
@@ -55,6 +70,7 @@ hcahps.st.bench <- filter(hcahps.st.bench, !is.na(mgroup))
 
 # create short names data frame
 hospID <- as.character(c(410001, 410004:410013))
+#hospID <- c(410001, 410004:410013) # 2015-10-14, keep as numeric
 hosp.short.names <- c("MHRI", "RWMC", "FATIMA", "NWPRT", "RIH", "SCH", "KENT", "WIH", "LNDMRK", "MIRIAM", "WSTRLY")
 hosp.short <- data_frame(provider_id = hospID, short_name = hosp.short.names)
 rm(hospID, hosp.short.names)
