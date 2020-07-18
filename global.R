@@ -1,10 +1,10 @@
 # global.R, runs at outset of application launch
 
 # load packages
-library("RSocrata")
-library("shiny")
-library("dplyr")
-library("lubridate")
+library(RSocrata)
+library(shiny)
+library(dplyr)
+library(lubridate)
 
 # create data frames
 # hcahps.nat.bench <- read.socrata("https://data.medicare.gov/resource/99ue-w85f.json")
@@ -72,7 +72,7 @@ hcahps.st.bench <- filter(hcahps.st.bench, !is.na(mgroup))
 hospID <- as.character(c(410001, 410004:410013))
 #hospID <- c(410001, 410004:410013) # 2015-10-14, keep as numeric
 hosp.short.names <- c("MHRI", "RWMC", "FATIMA", "NWPRT", "RIH", "SCH", "KENT", "WIH", "LNDMRK", "MIRIAM", "WSTRLY")
-hosp.short <- data_frame(provider_id = hospID, short_name = hosp.short.names)
+hosp.short <- tibble(provider_id = hospID, short_name = hosp.short.names)
 rm(hospID, hosp.short.names)
 
 # join to main data frame
