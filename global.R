@@ -10,11 +10,16 @@ library(lubridate)
 # hcahps.nat.bench <- read.socrata("https://data.medicare.gov/resource/99ue-w85f.json")
 hcahps.st.bench <- read.socrata("https://data.medicare.gov/resource/84jm-wiui.json?state=RI")
 
+
 # 2015-10-14 update, json not working, switch to csv, but now field names are different
 #hcahps.hosp <- read.socrata("https://data.medicare.gov/resource/dgck-syfz.json?state=RI")
-# hcahps.hosp <- read.socrata("https://data.medicare.gov/resource/dgck-syfz.csv?state=RI")
-hcahps.hosp <- read.csv("https://data.medicare.gov/resource/dgck-syfz.csv?state=RI",
-                        colClasses = "character")
+
+# 2020-07-19: csv was limited to 1000 rows, switched to json, seems to be working
+hcahps.hosp <- read.socrata("https://data.medicare.gov/resource/dgck-syfz.csv?state=RI")
+
+# hcahps.hosp <- read.csv("https://data.medicare.gov/resource/dgck-syfz.csv?state=RI",
+#                         colClasses = "character")
+
 colnames(hcahps.hosp) <- tolower(colnames(hcahps.hosp))
 colnames(hcahps.hosp) <- gsub("\\.", "_", colnames(hcahps.hosp))
 
@@ -22,35 +27,72 @@ ht1 <- 600 # summary plot height
 wd1 <- 507 # summary plot width
 
 # initialize measure group variable
-hcahps.hosp$mgroup <- NA
+# hcahps.hosp$mgroup <- NA
+# 
+# # set each measure group based on measure_id
+# hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_STAR_RATING"), "mgroup"] <- "Summary"
+# hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_CLEAN_HSP_A_P", "H_CLEAN_STAR_RATING"), "mgroup"] <- "Cleanliness"
+# hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_1_A_P", "H_COMP_1_STAR_RATING"), "mgroup"] <- "Nurse Communication"
+# hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_2_A_P", "H_COMP_2_STAR_RATING"), "mgroup"] <- "Doctor Communication"
+# hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_3_A_P", "H_COMP_3_STAR_RATING"), "mgroup"] <- "Staff Responsiveness"
+# hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_4_A_P", "H_COMP_4_STAR_RATING"), "mgroup"] <- "Pain Management"
+# hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_5_A_P", "H_COMP_5_STAR_RATING"), "mgroup"] <- "Communication about Meds"
+# hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_6_Y_P", "H_COMP_6_STAR_RATING"), "mgroup"] <- "Discharge Information"
+# hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_7_SA", "H_COMP_7_STAR_RATING"), "mgroup"] <- "Care Transition"
+# hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_HSP_RATING_9_10", "H_HSP_RATING_STAR_RATING"), "mgroup"] <- "Overall Rating"
+# hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_QUIET_HSP_A_P", "H_QUIET_STAR_RATING"), "mgroup"] <- "Quietness"
+# hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_RECMND_DY", "H_RECMND_STAR_RATING"), "mgroup"] <- "Recommend Hospital"
+# 
+# hcahps.st.bench$mgroup <- NA
+# hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_STAR_RATING"), "mgroup"] <- "Summary"
+# hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_CLEAN_HSP_A_P", "H_CLEAN_STAR_RATING"), "mgroup"] <- "Cleanliness"
+# hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_1_A_P", "H_COMP_1_STAR_RATING"), "mgroup"] <- "Nurse Communication"
+# hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_2_A_P", "H_COMP_2_STAR_RATING"), "mgroup"] <- "Doctor Communication"
+# hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_3_A_P", "H_COMP_3_STAR_RATING"), "mgroup"] <- "Staff Responsiveness"
+# hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_4_A_P", "H_COMP_4_STAR_RATING"), "mgroup"] <- "Pain Management"
+# hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_5_A_P", "H_COMP_5_STAR_RATING"), "mgroup"] <- "Communication about Meds"
+# hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_6_Y_P", "H_COMP_6_STAR_RATING"), "mgroup"] <- "Discharge Information"
+# hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_7_SA", "H_COMP_7_STAR_RATING"), "mgroup"] <- "Care Transition"
+# hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_HSP_RATING_9_10", "H_HSP_RATING_STAR_RATING"), "mgroup"] <- "Overall Rating"
+# hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_QUIET_HSP_A_P", "H_QUIET_STAR_RATING"), "mgroup"] <- "Quietness"
+# hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_RECMND_DY", "H_RECMND_STAR_RATING"), "mgroup"] <- "Recommend Hospital"
 
-# set each measure group based on measure_id
-hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_STAR_RATING"), "mgroup"] <- "Summary"
-hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_CLEAN_HSP_A_P", "H_CLEAN_STAR_RATING"), "mgroup"] <- "Cleanliness"
-hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_1_A_P", "H_COMP_1_STAR_RATING"), "mgroup"] <- "Nurse Communication"
-hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_2_A_P", "H_COMP_2_STAR_RATING"), "mgroup"] <- "Doctor Communication"
-hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_3_A_P", "H_COMP_3_STAR_RATING"), "mgroup"] <- "Staff Responsiveness"
-hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_4_A_P", "H_COMP_4_STAR_RATING"), "mgroup"] <- "Pain Management"
-hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_5_A_P", "H_COMP_5_STAR_RATING"), "mgroup"] <- "Communication about Meds"
-hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_6_Y_P", "H_COMP_6_STAR_RATING"), "mgroup"] <- "Discharge Information"
-hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_COMP_7_SA", "H_COMP_7_STAR_RATING"), "mgroup"] <- "Care Transition"
-hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_HSP_RATING_9_10", "H_HSP_RATING_STAR_RATING"), "mgroup"] <- "Overall Rating"
-hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_QUIET_HSP_A_P", "H_QUIET_STAR_RATING"), "mgroup"] <- "Quietness"
-hcahps.hosp[hcahps.hosp$hcahps_measure_id %in% c("H_RECMND_DY", "H_RECMND_STAR_RATING"), "mgroup"] <- "Recommend Hospital"
 
-hcahps.st.bench$mgroup <- NA
-hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_STAR_RATING"), "mgroup"] <- "Summary"
-hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_CLEAN_HSP_A_P", "H_CLEAN_STAR_RATING"), "mgroup"] <- "Cleanliness"
-hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_1_A_P", "H_COMP_1_STAR_RATING"), "mgroup"] <- "Nurse Communication"
-hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_2_A_P", "H_COMP_2_STAR_RATING"), "mgroup"] <- "Doctor Communication"
-hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_3_A_P", "H_COMP_3_STAR_RATING"), "mgroup"] <- "Staff Responsiveness"
-hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_4_A_P", "H_COMP_4_STAR_RATING"), "mgroup"] <- "Pain Management"
-hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_5_A_P", "H_COMP_5_STAR_RATING"), "mgroup"] <- "Communication about Meds"
-hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_6_Y_P", "H_COMP_6_STAR_RATING"), "mgroup"] <- "Discharge Information"
-hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_COMP_7_SA", "H_COMP_7_STAR_RATING"), "mgroup"] <- "Care Transition"
-hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_HSP_RATING_9_10", "H_HSP_RATING_STAR_RATING"), "mgroup"] <- "Overall Rating"
-hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_QUIET_HSP_A_P", "H_QUIET_STAR_RATING"), "mgroup"] <- "Quietness"
-hcahps.st.bench[hcahps.st.bench$hcahps_measure_id %in% c("H_RECMND_DY", "H_RECMND_STAR_RATING"), "mgroup"] <- "Recommend Hospital"
+# re-write of assigning groups
+meas_ids <- c("H_STAR_RATING",
+              "H_CLEAN_HSP_A_P", "H_CLEAN_STAR_RATING",
+              "H_COMP_1_A_P", "H_COMP_1_STAR_RATING",
+              "H_COMP_2_A_P", "H_COMP_2_STAR_RATING",
+              "H_COMP_3_A_P", "H_COMP_3_STAR_RATING",
+              "H_COMP_4_A_P", "H_COMP_4_STAR_RATING",
+              "H_COMP_5_A_P", "H_COMP_5_STAR_RATING",
+              "H_COMP_6_Y_P", "H_COMP_6_STAR_RATING",
+              "H_COMP_7_SA", "H_COMP_7_STAR_RATING",
+              "H_HSP_RATING_9_10", "H_HSP_RATING_STAR_RATING",
+              "H_QUIET_HSP_A_P", "H_QUIET_STAR_RATING",
+              "H_RECMND_DY", "H_RECMND_STAR_RATING")
+
+mgroup <- c("Summary",
+            rep("Cleanliness", 2),
+            rep("Nurse Communication", 2),
+            rep("Doctor Communication", 2),
+            rep("Staff Responsiveness", 2),
+            rep("Pain Management", 2),
+            rep("Communication about Meds", 2),
+            rep("Discharge Information", 2),
+            rep("Care Transition", 2),
+            rep("Overall Rating", 2),
+            rep("Quietness", 2),
+            rep("Recommend Hospital", 2))
+              
+meas_join <- tibble(hcahps_measure_id = meas_ids,
+                    mgroup = mgroup)
+
+hcahps.hosp <- hcahps.hosp %>% 
+  left_join(., meas_join, by = "hcahps_measure_id")
+
+hcahps.st.bench <- hcahps.st.bench %>% 
+  left_join(., meas_join, by = "hcahps_measure_id")
 
 
 # 2015-10-14 convert date fields
@@ -69,9 +111,12 @@ hcahps.hosp <- filter(hcahps.hosp, !is.na(mgroup)) %>%
 hcahps.st.bench <- filter(hcahps.st.bench, !is.na(mgroup))
 
 # create short names data frame
-hospID <- as.character(c(410001, 410004:410013))
+# hospID <- as.character(c(410001, 410004:410013))
+
+hospID <- hcahps.hosp$provider_id %>% unique()
+
 #hospID <- c(410001, 410004:410013) # 2015-10-14, keep as numeric
-hosp.short.names <- c("MHRI", "RWMC", "FATIMA", "NWPRT", "RIH", "SCH", "KENT", "WIH", "LNDMRK", "MIRIAM", "WSTRLY")
+hosp.short.names <- c("RWMC", "FATIMA", "NWPRT", "RIH", "SCH", "KENT", "WIH", "LNDMRK", "MIRIAM", "WSTRLY", "VAMC")
 hosp.short <- tibble(provider_id = hospID, short_name = hosp.short.names)
 rm(hospID, hosp.short.names)
 

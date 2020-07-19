@@ -1,9 +1,12 @@
 name: hospital_compare
+title:
+username:
 account: andylytics
 server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
 appId: 60997
-bundleId: 776719
+bundleId: 3409034
 url: https://andylytics.shinyapps.io/hospital_compare/
-when: 1491328833.79842
+when: 1595166268.28416
 asMultiple: FALSE
 asStatic: FALSE
