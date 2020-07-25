@@ -87,6 +87,7 @@ mgroup <- c("Summary",
               
 meas_join <- tibble(hcahps_measure_id = meas_ids,
                     mgroup = mgroup)
+rm(mgroup, meas_ids)
 
 hcahps.hosp <- hcahps.hosp %>% 
   left_join(., meas_join, by = "hcahps_measure_id")
@@ -138,7 +139,17 @@ stard <- filter(hcahps.hosp, patient_survey_star_rating != "Not Applicable") %>%
 # set choices variable
 mchoices <- unique(hcahps.hosp$mgroup)
 
+# arrange in preferred order
+mchoices <- append(mchoices[mchoices == "Summary"], sort(mchoices[mchoices != "Summary"]))
+
+# set text to default choice
 tabtext <- mchoices[1]
+
+spectral_vals <- c("#D7191C",
+                   "#FDAE61",
+                   "#FFFFBF",
+                   "#ABDDA4",
+                   "#2B83BA")
 
 # function for multiple ggplots
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {

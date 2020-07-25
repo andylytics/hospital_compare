@@ -5,8 +5,9 @@ account: andylytics
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 60997
-bundleId: 3409034
+bundleId: 3425965
 url: https://andylytics.shinyapps.io/hospital_compare/
-when: 1595166268.28416
+when: 1595510430.94891
 asMultiple: FALSE
 asStatic: FALSE
+ignoredFiles: scratch.R

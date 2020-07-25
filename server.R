@@ -11,6 +11,7 @@ library(ggplot2)
 library(scales)
 library(dplyr)
 library(markdown)
+library(RColorBrewer)
 
 
 shinyServer(function(input, output) {
@@ -26,11 +27,13 @@ shinyServer(function(input, output) {
     
     if (input$mgroup == "Summary"){
       
-      summaryplot <- ggplot(stard, aes(x = short_name, y = mgroup, label = patient_survey_star_rating, colour = as.numeric(patient_survey_star_rating))) + 
-        geom_point(size = 16, shape = 15) +
-        scale_colour_gradient(low = "red", high = "green") +
+      summaryplot <- ggplot(stard, aes(x = short_name, y = mgroup, label = patient_survey_star_rating, fill = patient_survey_star_rating)) + 
+        geom_tile(colour = "grey") +
+        # geom_point(size = 16, shape = 15) +
+        # scale_fill_gradient(low = "red", high = "green") +
+        scale_fill_brewer(palette = "Spectral") +
         coord_flip() +
-        geom_text(data = stard, aes(short_name, mgroup, label = patient_survey_star_rating), color = "black") +
+        geom_text(data = stard, aes(short_name, mgroup, label = patient_survey_star_rating), color = "#333333", fontface = "bold", size = 8) +
         theme(axis.title.y = element_blank(), axis.title.x = element_blank(), legend.title = element_blank(), axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5, size = 12), legend.position = "none",
               panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),
               axis.text.y = element_text(size = 12)) +
